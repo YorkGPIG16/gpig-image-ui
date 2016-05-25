@@ -2,8 +2,19 @@ package gpig.group2.imageui.model;
 
 public class StrandedPersonImage extends StrandedPersonPoi {
 
+	private int id;
 	private boolean yes;
 	private boolean no;
+
+	public int getId() {
+
+		return id;
+	}
+
+	public void setId(int id) {
+
+		this.id = id;
+	}
 
 	public boolean isYes() {
 

@@ -3,8 +3,10 @@ package gpig.group2.imageui.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import gpig.group2.imageui.model.StrandedPersonImage;
@@ -19,14 +21,22 @@ public class ImageVerificationController {
 	private ImageVerificationService imageVerificationService;
 
 	@RequestMapping(value = "/push", consumes = "application/xml", method = RequestMethod.POST)
-	public String pushVerImages(ResponseData pois) {
+	@ResponseBody
+	public String pushVerImages(@RequestBody ResponseData pois) {
 
 		imageVerificationService.addPois(pois);
 		return "Accepted";
 	}
 
-	@RequestMapping(value = "/imgs")
-	public ModelAndView getPostVerImages(@ModelAttribute("imgModel") StrandedPersonImage imgModel) {
+	@RequestMapping(value = "/imgs", method = RequestMethod.POST)
+	public ModelAndView postVerImages(@ModelAttribute("imgModel") StrandedPersonImage imgModel) {
+
+		imageVerificationService.forwardImageVer(imgModel);
+		return getVerImages();
+	}
+
+	@RequestMapping(value = "/imgs", method = RequestMethod.GET)
+	public ModelAndView getVerImages() {
 
 		ModelAndView mv = new ModelAndView("verificationui");
 		mv.addObject("imgModel", imageVerificationService.getNextImg());

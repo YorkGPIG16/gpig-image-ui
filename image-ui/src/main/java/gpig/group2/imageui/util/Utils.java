@@ -27,4 +27,15 @@ public class Utils {
 		return obj;
 	}
 
+	public static <T> T peek(List<T> li) {
+		
+		int ix = li.size() - 1;
+	
+		T obj = null;
+		if (ix >= 0) {
+			obj = li.get(ix);
+		}
+	
+		return obj;
+	}
 }

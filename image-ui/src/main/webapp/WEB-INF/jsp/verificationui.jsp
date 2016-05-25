@@ -20,6 +20,7 @@
 		<c:if test="${not empty imgModel}">
 			<form:form commandName="imgModel">
 				<img src="${imgModel.imageUrl}">
+				<form:hidden path="id" />
 				<form:button name="yes" value="YES">YES</form:button>
 				<form:button name="no" value="NO">NO</form:button>
 			</form:form>
