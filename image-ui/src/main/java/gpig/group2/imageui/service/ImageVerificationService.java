@@ -53,22 +53,6 @@ public class ImageVerificationService {
 	private List<StrandedPersonPoi> images = new LinkedList<>();
 	private Map<Integer, StrandedPersonPoi> peeked = new HashMap<>();
 
-	// Test data
-	{
-		makeTestData();
-	}
-
-	public void makeTestData() {
-
-		StrandedPersonImage spi = new StrandedPersonImage();
-		Point point = new Point();
-		point.setLatitude(100);
-		point.setLongitude(200);
-		spi.setImageLoc(point);
-		spi.setImageUrl("imajURL");
-		images.add(spi);
-	}
-
 	public synchronized void addPois(ResponseData pois) {
 
 		for (Image img : pois.getImagesX()) {
@@ -93,8 +77,6 @@ public class ImageVerificationService {
 	public void forwardImageVer(StrandedPersonImage spi) {
 
 		if (spi.isYes()) {
-			makeTestData(); // TODO: Remove me
-			
 			StrandedPersonPoi spp = peeked.get(spi.getId());
 			images.remove(spp);
 
