@@ -108,6 +108,7 @@ public class ImageVerificationService {
 	private String convertSppToSpXml(StrandedPersonPoi spp) {
 
 		StrandedPerson sp = new StrandedPerson(spp.getImageLoc(), IGNORE_SP_ESTIMATED_NUMBER, DateTime.now());
+		sp.setImageUrl(spp.getImageUrl());
 		String spXml = marshallXml(sp, StrandedPerson.class);
 		return spXml;
 	}
