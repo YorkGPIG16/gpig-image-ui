@@ -11,6 +11,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import org.joda.time.DateTime;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ import gpig.group2.imageui.model.StrandedPersonImage;
 import gpig.group2.imageui.model.StrandedPersonPoi;
 import gpig.group2.imageui.util.Utils;
 import gpig.group2.maps.geographic.Point;
+import gpig.group2.model.sensor.StrandedPerson;
 import gpig.group2.models.alerts.Alert;
 import gpig.group2.models.alerts.AlertMessage;
 import gpig.group2.models.alerts.Priority;
@@ -32,6 +34,11 @@ public class ImageVerificationService {
 
 	// TODO GET URL from service lookup
 	private static final String ALERTS_SERVICE_URL = "http://localhost:10080/GPIGGroup2UI/app/alerts";
+	private static final String MAPS_SERVICE_URL = "http://localhost:10080/GPIGGroup2MapsServer/app/push/strandedPerson";
+	private static final int IGNORE_SP_ESTIMATED_NUMBER = 0;
+
+	private static final String IMAGE_TAG = "#image:";
+	private static final String ADMIN_PASSWD = "YWRtaW46YWRtaW4=";
 
 	private static <T> String marshallXml(T obj, Class<T> clazz) {
 
@@ -80,21 +87,53 @@ public class ImageVerificationService {
 			StrandedPersonPoi spp = peeked.get(spi.getId());
 			images.remove(spp);
 
-			Alert alert = new Alert();
-			alert.priority = Priority.PRIORITY_LOW;
-			alert.message = "New stranded person(s) confirmed at (lat: " + spp.getImageLoc().getLatitudeX() + ", long: "
-					+ spp.getImageLoc().getLongitudeX() + ").#image:" + spp.getImageUrl();
-			AlertMessage alertMessage = new AlertMessage();
-			alertMessage.alerts = new ArrayList<>(1);
-			alertMessage.alerts.add(alert);
-
-			String alertXml = marshallXml(alertMessage, AlertMessage.class);
+			String alertXml = convertSppToAlertXml(spp);
 
 			try {
-				Unirest.post(ALERTS_SERVICE_URL).header("Content-Type", "application/xml").header("authorization", "Basic YWRtaW46YWRtaW4=").body(alertXml).asString();
+				postToAlertsService(alertXml);
+			} catch (UnirestException e) {
+				e.printStackTrace();
+			}
+
+			String sppXml = convertSppToSpXml(spp);
+
+			try {
+				postToMapsService(sppXml);
 			} catch (UnirestException e) {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private String convertSppToSpXml(StrandedPersonPoi spp) {
+
+		StrandedPerson sp = new StrandedPerson(spp.getImageLoc(), IGNORE_SP_ESTIMATED_NUMBER, DateTime.now());
+		String spXml = marshallXml(sp, StrandedPerson.class);
+		return spXml;
+	}
+
+	private void postToMapsService(String sppXml) throws UnirestException {
+
+		Unirest.post(MAPS_SERVICE_URL).header("Content-Type", "application/xml").body(sppXml).asString();
+	}
+
+	private String convertSppToAlertXml(StrandedPersonPoi spp) {
+
+		Alert alert = new Alert();
+		alert.priority = Priority.PRIORITY_LOW;
+		alert.message = "New stranded person(s) confirmed at (lat: " + spp.getImageLoc().getLatitudeX() + ", long: "
+				+ spp.getImageLoc().getLongitudeX() + ")." + IMAGE_TAG + spp.getImageUrl();
+		AlertMessage alertMessage = new AlertMessage();
+		alertMessage.alerts = new ArrayList<>(1);
+		alertMessage.alerts.add(alert);
+
+		String alertXml = marshallXml(alertMessage, AlertMessage.class);
+		return alertXml;
+	}
+
+	private void postToAlertsService(String alertXml) throws UnirestException {
+
+		Unirest.post(ALERTS_SERVICE_URL).header("Content-Type", "application/xml")
+				.header("authorization", "Basic " + ADMIN_PASSWD).body(alertXml).asString();
 	}
 }
