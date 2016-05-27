@@ -58,7 +58,7 @@ public class ImageVerificationService {
 
 	private int peekCntr = 0;
 	private List<StrandedPersonPoi> images = new LinkedList<>();
-	private Map<Integer, StrandedPersonPoi> peeked = new HashMap<>();
+	private Map<Integer, StrandedPersonImage> peeked = new HashMap<>();
 
 	public synchronized void addPois(ResponseData pois) {
 
@@ -73,10 +73,16 @@ public class ImageVerificationService {
 	public synchronized StrandedPersonImage getNextImg() {
 
 		StrandedPersonPoi peekPoi = Utils.peek(images);
-		StrandedPersonImage peekImg = (StrandedPersonImage) peekPoi;
+
+		if (peekPoi == null) {
+			return null;
+		}
+
+		StrandedPersonImage peekImg = new StrandedPersonImage(peekPoi);
 		peekImg.setId(peekCntr);
 		peeked.put(peekImg.getId(), peekImg);
 		peekCntr++;
+
 		return peekImg;
 	}
 
@@ -84,10 +90,10 @@ public class ImageVerificationService {
 	public void forwardImageVer(StrandedPersonImage spi) {
 
 		if (spi.isYes()) {
-			StrandedPersonPoi spp = peeked.get(spi.getId());
-			images.remove(spp);
-
-			String alertXml = convertSppToAlertXml(spp);
+			StrandedPersonImage spp2 = peeked.get(spi.getId());
+			images.remove(spp2.getOriginal());
+			peeked.remove(spp2);
+			String alertXml = convertSppToAlertXml(spp2);
 
 			try {
 				postToAlertsService(alertXml);
@@ -95,7 +101,7 @@ public class ImageVerificationService {
 				e.printStackTrace();
 			}
 
-			String sppXml = convertSppToSpXml(spp);
+			String sppXml = convertSppToSpXml(spp2);
 
 			try {
 				postToMapsService(sppXml);
