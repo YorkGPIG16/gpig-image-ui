@@ -5,7 +5,7 @@
 	<groupId>gpig.group2</groupId>
 	<artifactId>image-ui</artifactId>
 	<packaging>war</packaging>
-	<version>1.0.0</version>
+	<version>1.1-SNAPSHOT</version>
 	<name>GPIG Group 2 Image Verification UI</name>
 	<build>
 		<finalName>GPIGGroup2ImageVerUI</finalName>

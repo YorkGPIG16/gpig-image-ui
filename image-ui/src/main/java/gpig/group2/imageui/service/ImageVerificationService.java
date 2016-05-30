@@ -131,6 +131,7 @@ public class ImageVerificationService {
 				e.printStackTrace();
 			}
 
+			spp2.setTaskId(spp2.getOriginal().getTaskId());
 			String sppXml = convertSppToSpXml(spp2);
 
 			try {
