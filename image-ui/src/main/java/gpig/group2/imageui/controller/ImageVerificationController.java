@@ -1,5 +1,7 @@
 package gpig.group2.imageui.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -29,17 +31,23 @@ public class ImageVerificationController {
 	}
 
 	@RequestMapping(value = "/imgs", method = RequestMethod.POST)
-	public ModelAndView postVerImages(@ModelAttribute("imgModel") StrandedPersonImage imgModel) {
+	public ModelAndView postVerImages(HttpServletRequest req, @ModelAttribute("imgModel") StrandedPersonImage imgModel) {
 
 		imageVerificationService.forwardImageVer(imgModel);
-		return getVerImages();
+		return getVerImages(req);
 	}
 
 	@RequestMapping(value = "/imgs", method = RequestMethod.GET)
-	public ModelAndView getVerImages() {
+	public ModelAndView getVerImages(HttpServletRequest req) {
+
+		StrandedPersonImage nextImg = imageVerificationService.getNextImg();
+		String baseUrl = req.getProtocol().split("/")[0] + "://" + req.getRemoteHost() + ":" + req.getServerPort()
+		+ req.getContextPath() + "/";
+		nextImg.setImageUrl(String.format(baseUrl + "imgs/%s", nextImg.getImageUrl()));
 
 		ModelAndView mv = new ModelAndView("verificationui");
-		mv.addObject("imgModel", imageVerificationService.getNextImg());
+		mv.addObject("imgModel", nextImg);
+		
 		return mv;
 	}
 }

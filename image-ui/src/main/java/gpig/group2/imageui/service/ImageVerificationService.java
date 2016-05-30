@@ -1,12 +1,17 @@
 package gpig.group2.imageui.service;
 
 import java.io.StringWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -18,10 +23,12 @@ import org.springframework.stereotype.Service;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 
+import co.j6mes.infra.srf.query.QueryResponse;
+import co.j6mes.infra.srf.query.ServiceQuery;
+import co.j6mes.infra.srf.query.SimpleServiceQuery;
 import gpig.group2.imageui.model.StrandedPersonImage;
 import gpig.group2.imageui.model.StrandedPersonPoi;
 import gpig.group2.imageui.util.Utils;
-import gpig.group2.maps.geographic.Point;
 import gpig.group2.model.sensor.StrandedPerson;
 import gpig.group2.models.alerts.Alert;
 import gpig.group2.models.alerts.AlertMessage;
@@ -32,9 +39,31 @@ import gpig.group2.models.drone.response.ResponseData;
 @Service
 public class ImageVerificationService {
 
-	// TODO GET URL from service lookup
-	private static final String ALERTS_SERVICE_URL = "http://localhost:10080/GPIGGroup2UI/app/alerts";
-	private static final String MAPS_SERVICE_URL = "http://localhost:10080/GPIGGroup2MapsServer/app/push/strandedPerson";
+	private static final String ALERTS_PUSH_OPERATION = "alerts";
+	private static final String STRANDED_PERSON_PUSH_OPERATION = "push/strandedPerson";
+
+	private String alertsPushEndpoint;
+	private String strandedPersonPushEndpoint;
+	
+	private static String getEndpoint(String serviceName, String topicName) {
+		
+		ServiceQuery sq = new SimpleServiceQuery();
+		QueryResponse qr = sq.query(serviceName, topicName);
+		String endpoint = "http://" + qr.IP + ":" + qr.Port + "/" + qr.Path;
+		
+		return endpoint;
+	}
+
+	@PostConstruct
+	public void postConstruct() {
+
+		alertsPushEndpoint = getEndpoint("c2", "alerts") + ALERTS_PUSH_OPERATION;
+		strandedPersonPushEndpoint = getEndpoint("c2", "maps") + STRANDED_PERSON_PUSH_OPERATION;
+		
+		System.out.println("alertsPushEndpoint: " + alertsPushEndpoint);
+		System.out.println("strandedPersonPushEndpoint: " + strandedPersonPushEndpoint);
+	}
+
 	private static final int IGNORE_SP_ESTIMATED_NUMBER = 0;
 
 	private static final String IMAGE_TAG = "#image:";
@@ -123,7 +152,7 @@ public class ImageVerificationService {
 
 	private void postToMapsService(String sppXml) throws UnirestException {
 
-		Unirest.post(MAPS_SERVICE_URL).header("Content-Type", "application/xml").body(sppXml).asString();
+		Unirest.post(strandedPersonPushEndpoint).header("Content-Type", "application/xml").body(sppXml).asString();
 	}
 
 	private String convertSppToAlertXml(StrandedPersonPoi spp) {
@@ -142,7 +171,7 @@ public class ImageVerificationService {
 
 	private void postToAlertsService(String alertXml) throws UnirestException {
 
-		Unirest.post(ALERTS_SERVICE_URL).header("Content-Type", "application/xml")
+		Unirest.post(alertsPushEndpoint).header("Content-Type", "application/xml")
 				.header("authorization", "Basic " + ADMIN_PASSWD).body(alertXml).asString();
 	}
 }
