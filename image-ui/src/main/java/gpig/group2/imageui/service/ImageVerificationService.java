@@ -66,6 +66,7 @@ public class ImageVerificationService {
 			StrandedPersonPoi spImg = new StrandedPersonPoi();
 			spImg.setImageUrl(img.getUrlX());
 			spImg.setImageLoc(pois.getOriginX());
+			spImg.setTaskId(pois.getTaskIdX());
 			Utils.unshift(images, spImg);
 		}
 	}
@@ -113,8 +114,9 @@ public class ImageVerificationService {
 
 	private String convertSppToSpXml(StrandedPersonPoi spp) {
 
-		StrandedPerson sp = new StrandedPerson(spp.getImageLoc(), IGNORE_SP_ESTIMATED_NUMBER, DateTime.now());
+		StrandedPerson sp = new StrandedPerson(spp.getImageLoc(), IGNORE_SP_ESTIMATED_NUMBER, DateTime.now(),spp.getImageUrl());
 		sp.setImageUrl(spp.getImageUrl());
+		sp.setOwningTask(spp.getTaskId());
 		String spXml = marshallXml(sp, StrandedPerson.class);
 		return spXml;
 	}

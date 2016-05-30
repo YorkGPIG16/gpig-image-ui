@@ -2,6 +2,7 @@ package gpig.group2.imageui.model;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import gpig.group2.maps.geographic.Point;
 
@@ -13,6 +14,9 @@ public class StrandedPersonPoi {
 	
 	@XmlElement
 	private Point imageLoc;
+
+	@XmlElement
+	private Integer taskId;
 
 	public String getImageUrl() {
 
@@ -32,6 +36,15 @@ public class StrandedPersonPoi {
 	public void setImageLoc(Point imageLoc) {
 
 		this.imageLoc = imageLoc;
+	}
+
+	public void setTaskId(int id) {
+		this.taskId = id;
+	}
+
+	@XmlTransient
+	public Integer getTaskId() {
+		return this.taskId;
 	}
 
 	@Override
