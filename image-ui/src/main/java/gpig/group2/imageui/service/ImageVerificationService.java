@@ -1,10 +1,6 @@
 package gpig.group2.imageui.service;
 
 import java.io.StringWriter;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -44,13 +40,13 @@ public class ImageVerificationService {
 
 	private String alertsPushEndpoint;
 	private String strandedPersonPushEndpoint;
-	
+
 	private static String getEndpoint(String serviceName, String topicName) {
-		
+
 		ServiceQuery sq = new SimpleServiceQuery();
 		QueryResponse qr = sq.query(serviceName, topicName);
 		String endpoint = "http://" + qr.IP + ":" + qr.Port + "/" + qr.Path;
-		
+
 		return endpoint;
 	}
 
@@ -59,7 +55,7 @@ public class ImageVerificationService {
 
 		alertsPushEndpoint = getEndpoint("c2", "alerts") + ALERTS_PUSH_OPERATION;
 		strandedPersonPushEndpoint = getEndpoint("c2", "maps") + STRANDED_PERSON_PUSH_OPERATION;
-		
+
 		System.out.println("alertsPushEndpoint: " + alertsPushEndpoint);
 		System.out.println("strandedPersonPushEndpoint: " + strandedPersonPushEndpoint);
 	}
@@ -117,7 +113,7 @@ public class ImageVerificationService {
 	}
 
 	@Async
-	public void forwardImageVer(StrandedPersonImage spi) {
+	public synchronized void forwardImageVer(StrandedPersonImage spi) {
 
 		if (spi.isYes()) {
 			StrandedPersonImage spp2 = peeked.get(spi.getId());
@@ -143,7 +139,8 @@ public class ImageVerificationService {
 
 	private String convertSppToSpXml(StrandedPersonPoi spp) {
 
-		StrandedPerson sp = new StrandedPerson(spp.getImageLoc(), IGNORE_SP_ESTIMATED_NUMBER, DateTime.now(),spp.getImageUrl());
+		StrandedPerson sp = new StrandedPerson(spp.getImageLoc(), IGNORE_SP_ESTIMATED_NUMBER, DateTime.now(),
+				spp.getImageUrl());
 		sp.setImageUrl(spp.getImageUrl());
 		sp.setOwningTask(spp.getTaskId());
 		String spXml = marshallXml(sp, StrandedPerson.class);

@@ -31,7 +31,8 @@ public class ImageVerificationController {
 	}
 
 	@RequestMapping(value = "/imgs", method = RequestMethod.POST)
-	public ModelAndView postVerImages(HttpServletRequest req, @ModelAttribute("imgModel") StrandedPersonImage imgModel) {
+	public ModelAndView postVerImages(HttpServletRequest req,
+			@ModelAttribute("imgModel") StrandedPersonImage imgModel) {
 
 		imageVerificationService.forwardImageVer(imgModel);
 		return getVerImages(req);
@@ -42,12 +43,12 @@ public class ImageVerificationController {
 
 		StrandedPersonImage nextImg = imageVerificationService.getNextImg();
 		String baseUrl = req.getProtocol().split("/")[0] + "://" + req.getRemoteHost() + ":" + req.getServerPort()
-		+ req.getContextPath() + "/";
-		nextImg.setImageUrl(String.format(baseUrl + "imgs/%s", nextImg.getImageUrl()));
+				+ req.getContextPath() + "/";
+		nextImg.setImageUrl(String.format(baseUrl + "images/%s", nextImg.getImageUrl()));
 
 		ModelAndView mv = new ModelAndView("verificationui");
 		mv.addObject("imgModel", nextImg);
-		
+
 		return mv;
 	}
 }
