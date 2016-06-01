@@ -44,7 +44,10 @@ public class ImageVerificationController {
 		StrandedPersonImage nextImg = imageVerificationService.getNextImg();
 		String baseUrl = req.getProtocol().split("/")[0] + "://" + req.getRemoteHost() + ":" + req.getServerPort()
 				+ req.getContextPath() + "/";
-		nextImg.setImageUrl(String.format(baseUrl + "images/%s", nextImg.getImageUrl()));
+
+		if (nextImg != null) {
+			nextImg.setImageUrl(String.format(baseUrl + "images/%s", nextImg.getImageUrl()));
+		}
 
 		ModelAndView mv = new ModelAndView("verificationui");
 		mv.addObject("imgModel", nextImg);
