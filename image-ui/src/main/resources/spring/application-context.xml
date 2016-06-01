@@ -13,7 +13,7 @@
 
 	<aop:aspectj-autoproxy proxy-target-class="true" />
 
-	<context:property-placeholder location="file:/etc/gpig/app.properties" />
+	<context:property-placeholder location="file:/tmp/app.properties" />
 	<context:component-scan base-package="gpig.group2.imageui" />
 
 	<task:annotation-driven executor="myExecutor"
