@@ -45,11 +45,11 @@ public class ImageVerificationController {
 		String baseUrl = req.getProtocol().split("/")[0] + "://" + req.getRemoteHost() + ":" + req.getServerPort()
 				+ req.getContextPath() + "/";
 
-
-		ModelAndView mv = new ModelAndView("verificationui");
-		if(nextImg!=null) {
+		if (nextImg != null) {
 			nextImg.setImageUrl(String.format(baseUrl + "images/%s", nextImg.getImageUrl()));
 		}
+
+		ModelAndView mv = new ModelAndView("verificationui");
 		mv.addObject("imgModel", nextImg);
 
 

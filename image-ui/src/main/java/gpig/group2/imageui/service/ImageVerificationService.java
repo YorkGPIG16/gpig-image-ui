@@ -41,6 +41,10 @@ public class ImageVerificationService {
 	private String alertsPushEndpoint;
 	private String strandedPersonPushEndpoint;
 
+	private int peekCntr = 0;
+	private List<StrandedPersonPoi> images = new LinkedList<>();
+	private Map<Integer, StrandedPersonImage> peeked = new HashMap<>();
+
 	private static String getEndpoint(String serviceName, String topicName) {
 
 		ServiceQuery sq = new SimpleServiceQuery();
@@ -81,10 +85,6 @@ public class ImageVerificationService {
 		return sw.toString();
 	}
 
-	private int peekCntr = 0;
-	private List<StrandedPersonPoi> images = new LinkedList<>();
-	private Map<Integer, StrandedPersonImage> peeked = new HashMap<>();
-
 	public synchronized void addPois(ResponseData pois) {
 
 		for (Image img : pois.getImagesX()) {
@@ -120,11 +120,11 @@ public class ImageVerificationService {
 	@Async
 	public synchronized void forwardImageVer(StrandedPersonImage spi) {
 
+		StrandedPersonImage spp = peeked.get(spi.getId());
+
 		if (spi.isYes()) {
-			StrandedPersonImage spp2 = peeked.get(spi.getId());
-			images.remove(spp2.getOriginal());
-			peeked.remove(spp2);
-			String alertXml = convertSppToAlertXml(spp2);
+			String alertXml = convertSppToAlertXml(spp);
+			String sppXml = convertSppToSpXml(spp);
 
 			try {
 				postToAlertsService(alertXml);
@@ -132,15 +132,15 @@ public class ImageVerificationService {
 				e.printStackTrace();
 			}
 
-			spp2.setTaskId(spp2.getOriginal().getTaskId());
-			String sppXml = convertSppToSpXml(spp2);
-
 			try {
 				postToMapsService(sppXml);
 			} catch (UnirestException e) {
 				e.printStackTrace();
 			}
 		}
+
+		images.remove(spp.getOriginal());
+		peeked.remove(spp);
 	}
 
 	private String convertSppToSpXml(StrandedPersonPoi spp) {

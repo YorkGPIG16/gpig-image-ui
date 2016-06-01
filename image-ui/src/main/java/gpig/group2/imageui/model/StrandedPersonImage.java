@@ -15,6 +15,7 @@ public class StrandedPersonImage extends StrandedPersonPoi {
 		original = spp;
 		setImageLoc(spp.getImageLoc());
 		setImageUrl(spp.getImageUrl());
+		setTaskId(spp.getTaskId());
 	}
 
 	
