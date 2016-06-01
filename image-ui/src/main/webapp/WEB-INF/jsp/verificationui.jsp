@@ -9,7 +9,7 @@
 	xmlns:c="http://java.sun.com/jsp/jstl/core">
 <head>
 <meta charset="UTF-8" />
-<meta http-equiv="refresh" content="1" />
+<meta http-equiv="refresh" content="10" />
 <title>Image Verification</title>
 </head>
 <body>
