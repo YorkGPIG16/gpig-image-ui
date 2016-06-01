@@ -110,9 +110,14 @@ public class ImageVerificationService {
 		}
 
 		StrandedPersonImage peekImg = new StrandedPersonImage(peekPoi);
-		peekImg.setId(peekCntr);
-		peeked.put(peekImg.getId(), peekImg);
-		peekCntr++;
+
+		if (peeked.containsKey(peekCntr - 1)) {
+			peekImg.setId(peekCntr - 1);
+		} else {
+			peekImg.setId(peekCntr);
+			peeked.put(peekImg.getId(), peekImg);
+			peekCntr++;
+		}
 
 		return peekImg;
 	}
@@ -140,7 +145,7 @@ public class ImageVerificationService {
 		}
 
 		images.remove(spp.getOriginal());
-		peeked.remove(spp);
+		peeked.remove(spp.getId());
 	}
 
 	private String convertSppToSpXml(StrandedPersonPoi spp) {
