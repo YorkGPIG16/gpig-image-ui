@@ -95,7 +95,12 @@ public class ImageVerificationService {
 			StrandedPersonPoi spImg = new StrandedPersonPoi();
 			spImg.setImageUrl(img.getUrlX());
 			spImg.setImageLoc(pois.getOriginX());
-			spImg.setTaskId(pois.getTaskIdX());
+			if(pois.getTaskIdX() != null) {
+
+				spImg.setTaskId(pois.getTaskIdX());
+			} else {
+				spImg.setTaskId(0);
+			}
 			Utils.unshift(images, spImg);
 		}
 	}
