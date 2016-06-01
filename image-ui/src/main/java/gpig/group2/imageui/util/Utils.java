@@ -1,17 +1,23 @@
 package gpig.group2.imageui.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {
 
 	public static <T> void unshift(List<T> li, T itm) {
-		int lastIx = li.size() - 1;
-		
-		for (int ix = lastIx; ix >= 0; ix--) {
-			li.add(ix + 1, li.get(ix));
+
+		List<T> tmp = new ArrayList<>();
+		tmp.addAll(li);
+		li.clear();
+
+		li.add(itm);
+
+		for(T item : tmp) {
+			li.add(item);
 		}
 		
-		li.add(0, itm);
+
 	}
 
 	public static <T> T pop(List<T> li) {
