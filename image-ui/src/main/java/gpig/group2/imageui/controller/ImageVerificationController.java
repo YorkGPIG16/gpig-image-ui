@@ -42,7 +42,7 @@ public class ImageVerificationController {
 	public ModelAndView getVerImages(HttpServletRequest req) {
 
 		StrandedPersonImage nextImg = imageVerificationService.getNextImg();
-		String baseUrl =  "/" + req.getContextPath() + "/";
+		String baseUrl =  req.getContextPath() + "/";
 
 		if (nextImg != null) {
 			nextImg.setImageUrl(String.format(baseUrl + "images/%s", nextImg.getImageUrl()));
